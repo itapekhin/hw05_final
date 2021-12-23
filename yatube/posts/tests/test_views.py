@@ -218,7 +218,7 @@ class viewsTests(TestCase):
         )
         form_field_text = response1.context['comments'][0].text
         self.assertEqual(form_field_text, '123456')
-    
+
     def test_index_cash(self):
         cache.clear()
         response = self.client.get(
@@ -237,5 +237,3 @@ class viewsTests(TestCase):
             response.getvalue().decode('UTF8'),
             viewsTests.post[2].text
         )
-
-

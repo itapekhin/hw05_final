@@ -1,10 +1,8 @@
 from django.test import TestCase, Client
-from posts.models import Post, Group, User, Comments
+from posts.models import Post, Group, User
 from django.urls import reverse
-from django import forms
 import time
 from mixer.backend.django import mixer
-from django.core.cache import cache
 
 
 class podpiskaTests(TestCase):
@@ -16,8 +14,6 @@ class podpiskaTests(TestCase):
         cls.author = User.objects.create_user(username='0')
         cls.author1 = User.objects.create_user(username='1')
         cls.author2 = User.objects.create_user(username='2')
-
-
         cls.group = mixer.cycle(3).blend(
             Group,
             title=mixer.sequence('TestGroup{0}'),
@@ -62,10 +58,12 @@ class podpiskaTests(TestCase):
     
     def test_podpiska(self):
         self.authorized_author.get(reverse(
-            'posts:profile_follow', kwargs={'username': podpiskaTests.author2})
+            'posts:profile_follow',
+            kwargs={'username': podpiskaTests.author2})
         )
         self.authorized_author.get(reverse(
-            'posts:profile_follow', kwargs={'username': podpiskaTests.author1})
+            'posts:profile_follow',
+            kwargs={'username': podpiskaTests.author1})
         )
         response = self.authorized_author.get(reverse(
             'posts:follow_index')
@@ -73,7 +71,8 @@ class podpiskaTests(TestCase):
         first_object = response.context['page_obj'].object_list[0]
         self.assertEqual(first_object, podpiskaTests.post2)
         self.authorized_author.get(reverse(
-            'posts:profile_unfollow', kwargs={'username': podpiskaTests.author2})
+            'posts:profile_unfollow',
+            kwargs={'username': podpiskaTests.author2})
         )
         response1 = self.authorized_author.get(reverse(
             'posts:follow_index')
@@ -96,5 +95,3 @@ class podpiskaTests(TestCase):
         )
         first_object3 = response3.context['page_obj'].object_list
         self.assertNotIn(d_post, first_object3)
-
-
