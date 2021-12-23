@@ -1,7 +1,6 @@
 import shutil
 import tempfile
 import random
-import time
 from django.test import TestCase, Client, override_settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from posts.models import Post, Group, User
@@ -10,9 +9,9 @@ from django.conf import settings
 from mixer.backend.django import mixer
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
+
+
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
-
-
 class ImageTests(TestCase):
     @classmethod
     def setUpClass(cls):
