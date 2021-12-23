@@ -10,9 +10,9 @@ from django.conf import settings
 from mixer.backend.django import mixer
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
-# Для сохранения media-файлов в тестах будет использоватьсяgs
-# временная папка TEMP_MEDIA_ROOT, а потом мы ее удалим
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+
+
 class ImageTests(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -33,8 +33,7 @@ class ImageTests(TestCase):
             author=cls.author,
             group=(Group.objects.get(slug=f'test{random.randrange(0, 1, 2)}'))
         )
-        time.sleep(0.01)
-    
+
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
@@ -63,7 +62,7 @@ class ImageTests(TestCase):
             'text': 'Test',
             'group': '1',
             'image': uploaded
-            }
+        }
         self.authorized_author.post(
             reverse('posts:post_create'),
             data=form_data,
@@ -75,7 +74,6 @@ class ImageTests(TestCase):
             group='1',
             image='posts/small.gif'
         ).exists())
-        #проверка появления картинки на страницах
         templates_pages_names = {
             'posts/small.gif': reverse('posts:index'),
             'posts/small.gif': reverse(

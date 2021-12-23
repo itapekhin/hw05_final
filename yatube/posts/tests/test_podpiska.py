@@ -43,6 +43,7 @@ class podpiskaTests(TestCase):
             text='Тестовый текст',
             group=cls.group[1]
         )
+
     def setUp(self):
         self.author = podpiskaTests.author
         self.authorized_author = Client()
@@ -55,7 +56,7 @@ class podpiskaTests(TestCase):
         self.author2 = podpiskaTests.author2
         self.authorized_author2 = Client()
         self.authorized_author2.force_login(self.author2)
-    
+
     def test_podpiska(self):
         self.authorized_author.get(reverse(
             'posts:profile_follow',
