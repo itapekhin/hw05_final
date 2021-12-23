@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% block title %}МОЯ ПРЕЛЕСТЬ{% endblock %}
+{% block content %}
+      <div class="container py-5"> 
+        {% include 'posts/includes/switcher.html' %}    
+        <h1>{{ text }}</h1>
+        <article>
+          {% for post in page_obj  %}
+            <ul>
+              <li>
+                Автор: {{ post.author.get_full_name }}
+              </li>
+              <li>
+                Дата публикации: {{ post.pub_date|date:"d E Y" }}
+              </li>
+            </ul>
+              <div>
+              {% thumbnail post.image "320x160" crop="center" upscale=True as im %}
+              <img style="margin:{{ im|margin:"100x700" }} class="card-img my-2" src="{{ im.url }}" width="{{ im.x }}" height="{{ im.y }}"">
+              {% endthumbnail %}
+              <p>{{ post }}</p> 
+              </div>
+            {% if post.group %}   
+            <a href="{% url 'posts:group_posts' post.group.slug %}">все записи группы: {{ post.group.title }}</a
+            {% endif %}
+            {% if not forloop.last %}<hr>{% endif %}
+          {% endfor %} 
+          {% include 'posts/includes/paginator.html' %}
+        </article>
+      </div>  
+{% endblock %} 
