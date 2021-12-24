@@ -1,8 +1,9 @@
 from django.test import TestCase, Client
-from posts.models import Post, Group, User
+from posts.models import Post, Group, User, Follow
 from django.urls import reverse
 import time
 from mixer.backend.django import mixer
+from django.db import IntegrityError
 
 
 class podpiskaTests(TestCase):
@@ -98,3 +99,6 @@ class podpiskaTests(TestCase):
         )
         first_object3 = response3.context['page_obj'].object_list
         self.assertNotIn(d_post, first_object3)
+
+        with self.assertRaisesMessage(IntegrityError, 'authoe_author'):
+            Follow.objects.create(user=self.author, author=self.author)
