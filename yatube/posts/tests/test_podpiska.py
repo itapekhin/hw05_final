@@ -100,5 +100,5 @@ class podpiskaTests(TestCase):
         first_object3 = response3.context['page_obj'].object_list
         self.assertNotIn(d_post, first_object3)
 
-        with self.assertRaises(IntegrityError):
+        with self.assertRaisesMessage(IntegrityError, 'authoe_author'):
             Follow.objects.create(user=self.author, author=self.author)
