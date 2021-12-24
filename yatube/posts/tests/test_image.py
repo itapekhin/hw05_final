@@ -1,7 +1,6 @@
 import shutil
 import tempfile
 import random
-import time
 from django.test import TestCase, Client, override_settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from posts.models import Post, Group, User
@@ -13,6 +12,8 @@ TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 # Для сохранения media-файлов в тестах будет использоватьсяgs
 # временная папка TEMP_MEDIA_ROOT, а потом мы ее удалим
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
+
+
 class ImageTests(TestCase):
     @classmethod
     def setUpClass(cls):
