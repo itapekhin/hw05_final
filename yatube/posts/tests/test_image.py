@@ -1,6 +1,7 @@
 import shutil
 import tempfile
 import random
+import time
 from django.test import TestCase, Client, override_settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from posts.models import Post, Group, User
@@ -9,8 +10,8 @@ from django.conf import settings
 from mixer.backend.django import mixer
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
-
-
+# Для сохранения media-файлов в тестах будет использоватьсяgs
+# временная папка TEMP_MEDIA_ROOT, а потом мы ее удалим
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class ImageTests(TestCase):
     @classmethod
@@ -32,7 +33,8 @@ class ImageTests(TestCase):
             author=cls.author,
             group=(Group.objects.get(slug=f'test{random.randrange(0, 1, 2)}'))
         )
-
+        time.sleep(0.01)
+    
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
@@ -61,7 +63,7 @@ class ImageTests(TestCase):
             'text': 'Test',
             'group': '1',
             'image': uploaded
-        }
+            }
         self.authorized_author.post(
             reverse('posts:post_create'),
             data=form_data,
@@ -73,30 +75,26 @@ class ImageTests(TestCase):
             group='1',
             image='posts/small.gif'
         ).exists())
-
-        response0 = self.authorized_author.get(reverse('posts:index'))
-        first_object0 = response0.context['page_obj'][0]
-        post_image = first_object0.image
-        self.assertEqual(post_image, 'posts/small.gif')
-
+        #проверка появления картинки на страницах
+        templates_pages_names = {
+            'posts/small.gif': reverse('posts:index'),
+            'posts/small.gif': reverse(
+                'posts:group_posts',
+                kwargs={'slug': '1'}
+            ),
+            'posts/small.gif': reverse(
+                'posts:profile', kwargs={'username': '2'}
+            ),
+        }
+        for template, reverse_name in templates_pages_names.items():
+            with self.subTest(reverse_name=reverse_name):
+                response = self.authorized_author.get(reverse_name)
+                first_object1 = response.context['page_obj'][0]
+                post_image1 = first_object1.image
+                self.assertEqual(post_image1, template)
         response1 = self.authorized_author.get(reverse(
-            'posts:post_detail', kwargs={'post_id': '13'})
+                'posts:post_detail', kwargs={'post_id': '13'})
         )
         first_object1 = response1.context['post']
         post_image = first_object1.image
-        self.assertEqual(post_image, 'posts/small.gif')
-
-        response2 = self.authorized_author.get(reverse(
-            'posts:group_posts',
-            kwargs={'slug': 'test0'})
-        )
-        first_object2 = response2.context['page_obj'][0]
-        post_image = first_object2.image
-        self.assertEqual(post_image, 'posts/small.gif')
-
-        response3 = self.authorized_author.get(reverse(
-            'posts:profile', kwargs={'username': '2'})
-        )
-        first_object3 = response3.context['page_obj'][0]
-        post_image = first_object3.image
         self.assertEqual(post_image, 'posts/small.gif')

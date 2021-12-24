@@ -18,7 +18,6 @@ class Group(models.Model):
     def __str__(self):
         return self.title
 
-
 class Post(models.Model):
     text = models.TextField(
         verbose_name="Содержание статьи",
@@ -55,40 +54,36 @@ class Post(models.Model):
     def __str__(self):
         return self.text[:30]
 
-
 class Comments(models.Model):
-    post = models.ForeignKey(
-        Post,
-        on_delete=models.CASCADE,
-        related_name='comments',
-        blank=True,
-        null=True,
-    )
+    post = models.ForeignKey(Post,  
+			     on_delete=models.CASCADE,  
+			     related_name='comments',
+                 blank=True,
+                 null=True,) 
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-    )
-    text = models.CharField(max_length=200)
-    created = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ('created',)
-
+        )
+    text = models.CharField(max_length=200)  
+    created = models.DateTimeField(auto_now_add=True)  
+      
+    class Meta:  
+        ordering = ('created',)  
+          
     def __str__(self):
         return 'Comment by {} on {}'.format(self.text, self.post)
-
 
 class Follow(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='follower'
-    )
+        )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='following'
-    )
-
+        )
     def __str__(self):
         return f'Подписчик {self.user}, Автор {self.author}'
+    

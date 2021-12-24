@@ -33,7 +33,6 @@ class viewsTests(TestCase):
             text='Тестовый текст',
             group=cls.group[1]
         )
-
     def setUp(self):
         self.author = viewsTests.authot
         self.authorized_author = Client()
@@ -189,9 +188,9 @@ class viewsTests(TestCase):
             kwargs={'username': '2'}) + '?page=2'
         )
         self.assertEqual(len(response.context['page_obj']), 2)
-
+    
     def test_comments(self):
-        comment_count = Comments.objects.count()
+        comment_count = Comments.objects.count()  
         form_data = {
             'text': '123456'
         }
@@ -206,11 +205,8 @@ class viewsTests(TestCase):
                 'posts:add_comment', kwargs={'post_id': 3}
             ), form_data, follow=True
         )
-        self.assertEqual(Comments.objects.count(), comment_count + 1)
-        self.assertRedirects(response, reverse(
-            'posts:post_detail',
-            kwargs={'post_id': 3})
-        )
+        self.assertEqual(Comments.objects.count(), comment_count+1)
+        self.assertRedirects(response, reverse('posts:post_detail', kwargs={'post_id': 3}))
         response1 = self.authorized_author.get(
             reverse(
                 'posts:post_detail', kwargs={'post_id': 3}
@@ -218,7 +214,7 @@ class viewsTests(TestCase):
         )
         form_field_text = response1.context['comments'][0].text
         self.assertEqual(form_field_text, '123456')
-
+    
     def test_index_cash(self):
         cache.clear()
         response = self.client.get(
@@ -233,7 +229,6 @@ class viewsTests(TestCase):
         response = self.client.get(
             reverse('posts:index')
         )
-        self.assertNotIn(
-            response.getvalue().decode('UTF8'),
-            viewsTests.post[2].text
-        )
+        self.assertNotIn(response.getvalue().decode('UTF8'), viewsTests.post[2].text)
+
+
