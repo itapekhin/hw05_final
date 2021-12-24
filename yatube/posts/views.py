@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.conf import settings
 from django.shortcuts import get_object_or_404, redirect, render
-
+from django.db import IntegrityError
 from posts.models import Group, Post, User, Follow
 from .forms import PostForm, CommentForm
 
@@ -142,9 +142,12 @@ def follow_index(request):
 def profile_follow(request, username):
     # Подписаться на автора
     author = User.objects.get(username=username)
-    if request.user is not author:
-        Follow.objects.create(user=request.user, author=author)
-    return redirect('posts:profile', username=username)
+    try:
+        if request.user is not author:
+            Follow.objects.create(user=request.user, author=author)
+        return redirect('posts:profile', username=username)
+    except IntegrityError:
+        return redirect('posts:profile', username=username)
 
 
 @login_required
