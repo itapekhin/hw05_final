@@ -1,5 +1,5 @@
 from django.test import TestCase, Client
-from posts.models import Post, Group, User, Follow
+from posts.models import Post, Group, User
 from django.urls import reverse
 import time
 from mixer.backend.django import mixer
