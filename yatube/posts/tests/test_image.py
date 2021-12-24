@@ -9,12 +9,11 @@ from django.conf import settings
 from mixer.backend.django import mixer
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
-# Для сохранения media-файлов в тестах будет использоватьсяgs
-# временная папка TEMP_MEDIA_ROOT, а потом мы ее удалим
+
+
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
-
-
 class ImageTests(TestCase):
+    
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
