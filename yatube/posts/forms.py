@@ -31,6 +31,7 @@ class PostForm(ModelForm):
             }),
         }
 
+
 class CommentForm(ModelForm):
 
     class Meta:
