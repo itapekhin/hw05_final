@@ -3,9 +3,8 @@ from django.core.paginator import Paginator
 from django.conf import settings
 from django.shortcuts import get_object_or_404, redirect, render
 
-from posts.models import Group, Post, User, Comments, Follow
+from posts.models import Group, Post, User, Follow
 from .forms import PostForm, CommentForm
-from django.views.decorators.cache import cache_page
 
 
 def index(request):
@@ -112,6 +111,7 @@ def post_edit(request, post_id):
     }
     return render(request, 'posts/create_post.html', context)
 
+
 @login_required
 def add_comment(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
@@ -122,6 +122,7 @@ def add_comment(request, post_id):
         comment.post = post
         comment.save()
     return redirect('posts:post_detail', post_id=post_id)
+
 
 @login_required
 def follow_index(request):
@@ -136,6 +137,7 @@ def follow_index(request):
     }
     return render(request, 'posts/follow.html', context)
 
+
 @login_required
 def profile_follow(request, username):
     # Подписаться на автора
@@ -143,6 +145,7 @@ def profile_follow(request, username):
     if request.user is not author:
         Follow.objects.create(user=request.user, author=author)
     return redirect('posts:profile', username=username)
+
 
 @login_required
 def profile_unfollow(request, username):
