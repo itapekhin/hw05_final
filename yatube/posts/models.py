@@ -22,7 +22,9 @@ class Group(models.Model):
 class Post(models.Model):
     text = models.TextField(
         verbose_name="Содержание статьи",
-        help_text="Введите текст статьи"
+        help_text="Введите текст статьи",
+        blank=True,
+        null=True,
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
@@ -46,7 +48,8 @@ class Post(models.Model):
     image = models.ImageField(
         'Картинка',
         upload_to='posts/',
-        blank=True
+        blank=True,
+        null=True,
     )
 
     class Meta:
@@ -68,7 +71,7 @@ class Comment(models.Model):
         User,
         on_delete=models.CASCADE,
     )
-    text = models.CharField(max_length=200)
+    text = models.TextField(max_length=200)
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -82,13 +85,23 @@ class Follow(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='follower'
+        related_name='follower',
+        null=True
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='following'
+        related_name='following',
+        null=True
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'author'],
+                                    name='one_following'),
+            models.CheckConstraint(check=~models.Q(user=models.F('author')),
+                                   name='user_not_author')
+        ]
 
     def __str__(self):
         return f'Подписчик {self.user}, Автор {self.author}'

@@ -3,6 +3,7 @@ from posts.models import Post, Group, User
 from django.urls import reverse
 import time
 from mixer.backend.django import mixer
+from django.db import IntegrityError
 
 
 class podpiskaTests(TestCase):
@@ -59,6 +60,7 @@ class podpiskaTests(TestCase):
         self.authorized_author2.force_login(self.author2)
 
     def test_podpiska(self):
+
         self.authorized_author.get(reverse(
             'posts:profile_follow',
             kwargs={'username': podpiskaTests.author2})
@@ -97,3 +99,9 @@ class podpiskaTests(TestCase):
         )
         first_object3 = response3.context['page_obj'].object_list
         self.assertNotIn(d_post, first_object3)
+    
+        with self.assertRaises(IntegrityError):
+            self.authorized_author.get(reverse(
+            'posts:profile_follow',
+            kwargs={'username': podpiskaTests.author})
+        )
