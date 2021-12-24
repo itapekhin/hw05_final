@@ -3,7 +3,6 @@ from posts.models import Post, Group, User
 from django.urls import reverse
 import time
 from mixer.backend.django import mixer
-from django.db import IntegrityError
 
 
 class podpiskaTests(TestCase):
