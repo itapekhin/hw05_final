@@ -1,5 +1,5 @@
 from django.test import TestCase, Client
-from posts.models import Post, Group, User, Comments
+from posts.models import Post, Group, User, Comment
 from django.urls import reverse
 from django import forms
 import time
@@ -190,8 +190,8 @@ class viewsTests(TestCase):
         )
         self.assertEqual(len(response.context['page_obj']), 2)
 
-    def test_comments(self):
-        comment_count = Comments.objects.count()
+    def test_comment(self):
+        comment_count = Comment.objects.count()
         form_data = {
             'text': '123456'
         }
@@ -200,13 +200,13 @@ class viewsTests(TestCase):
                 'posts:add_comment', kwargs={'post_id': 1}
             ), form_data, follow=True
         )
-        self.assertEqual(Comments.objects.count(), comment_count)
+        self.assertEqual(Comment.objects.count(), comment_count)
         response = self.authorized_author.post(
             reverse(
                 'posts:add_comment', kwargs={'post_id': 3}
             ), form_data, follow=True
         )
-        self.assertEqual(Comments.objects.count(), comment_count + 1)
+        self.assertEqual(Comment.objects.count(), comment_count + 1)
         self.assertRedirects(response, reverse(
             'posts:post_detail',
             kwargs={'post_id': 3})

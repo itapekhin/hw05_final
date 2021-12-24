@@ -1,6 +1,6 @@
 from django.forms import ModelForm, Select, Textarea
 
-from posts.models import Post, Comments
+from posts.models import Post, Comment
 
 
 class PostForm(ModelForm):
@@ -35,7 +35,7 @@ class PostForm(ModelForm):
 class CommentForm(ModelForm):
 
     class Meta:
-        model = Comments
+        model = Comment
         labels = {
             'text': 'Текст комментария',
         }
