@@ -101,6 +101,7 @@ class podpiskaTests(TestCase):
         self.assertNotIn(d_post, first_object3)
 
         with self.assertRaises(IntegrityError):
-            self.authorized_author.get(reverse('posts:profile_follow',
-            kwargs={'username': podpiskaTests.author})
+            self.authorized_author.get(
+                reverse('posts:profile_follow',
+                kwargs={'username': podpiskaTests.author})
             )
