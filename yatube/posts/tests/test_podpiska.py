@@ -103,6 +103,5 @@ class podpiskaTests(TestCase):
         with self.assertRaises(IntegrityError):
             self.authorized_author.get(
                 reverse('posts:profile_follow',
-                kwargs={'username': podpiskaTests.author},
-                )
+                        kwargs={'username': podpiskaTests.author},)
             )
