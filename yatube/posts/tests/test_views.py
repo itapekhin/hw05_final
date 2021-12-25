@@ -44,13 +44,13 @@ class viewsTests(TestCase):
             'posts/index.html': reverse('posts:index'),
             'posts/group_list.html': reverse(
                 'posts:group_posts',
-                kwargs={'slug': 'test0'}
+                kwargs={'slug': viewsTests.group[0].slug}
             ),
             'posts/profile.html': reverse(
-                'posts:profile', kwargs={'username': '2'}
+                'posts:profile', kwargs={'username': viewsTests.authot.username}
             ),
             'posts/post_detail.html': reverse(
-                'posts:post_detail', kwargs={'post_id': 1}
+                'posts:post_detail', kwargs={'post_id': viewsTests.post[0].id}
             ),
         }
         for template, reverse_name in templates_pages_names.items():
@@ -66,7 +66,7 @@ class viewsTests(TestCase):
 
     def test_about_post_edit_correct_template(self):
         response = self.authorized_author.get(reverse(
-            'posts:post_edit', kwargs={'post_id': 1})
+            'posts:post_edit', kwargs={'post_id': viewsTests.post[0].id})
         )
         self.assertTemplateUsed(response, 'posts/create_post.html')
 
@@ -83,7 +83,7 @@ class viewsTests(TestCase):
     def test_group_list_page_show_correct_context(self):
         response = self.authorized_author.get(reverse(
             'posts:group_posts',
-            kwargs={'slug': 'test1'})
+            kwargs={'slug': viewsTests.group[1].slug})
         )
         group = response.context['group']
         first_object = response.context['page_obj'][0]
@@ -91,12 +91,12 @@ class viewsTests(TestCase):
         post_text_0 = first_object.text
         self.assertEqual(post_author_0, viewsTests.post[0].author)
         self.assertEqual(post_text_0, 'Тестовый текст')
-        self.assertAlmostEqual(group, Group.objects.get(slug='test1'))
+        self.assertAlmostEqual(group, viewsTests.group[1])
 
     def test_profile_page_show_correct_context(self):
         response = self.authorized_author.get(reverse(
             'posts:profile',
-            kwargs={'username': '2'})
+            kwargs={'username': viewsTests.authot.username})
         )
         author = response.context['author']
         profile_count = response.context['profile_count']
@@ -109,7 +109,7 @@ class viewsTests(TestCase):
     def test_post_detail_page_show_correct_context(self):
         response = self.authorized_author.get(reverse(
             'posts:post_detail',
-            kwargs={'post_id': 1})
+            kwargs={'post_id': viewsTests.post[0].id})
         )
         post = response.context['post']
         post_count = response.context['post_count']
@@ -138,9 +138,9 @@ class viewsTests(TestCase):
         form_field_text = response.context['form'].initial['text']
         post = response.context['post']
         post_is_edit = response.context['is_edit']
-        self.assertEqual(form_field_group, 1)
-        self.assertEqual(form_field_text, 'testus0')
-        self.assertEqual(post, Post.objects.get(text='testus0'))
+        self.assertEqual(form_field_group, viewsTests.group[0].id)
+        self.assertEqual(form_field_text, viewsTests.post[0].text)
+        self.assertEqual(post, viewsTests.post[0])
         self.assertEqual(post_is_edit, True)
 
     def test_post_creat_page_show_correct_context(self):
@@ -165,28 +165,28 @@ class viewsTests(TestCase):
     def test_first_page_group_list(self):
         response = self.authorized_author.get(reverse(
             'posts:group_posts',
-            kwargs={'slug': 'test0'})
+            kwargs={'slug': viewsTests.group[0].slug})
         )
         self.assertEqual(len(response.context['page_obj']), 10)
 
     def test_second_page_group_list(self):
         response = self.authorized_author.get(reverse(
             'posts:group_posts',
-            kwargs={'slug': 'test0'}) + '?page=2'
+            kwargs={'slug': viewsTests.group[0].slug}) + '?page=2'
         )
         self.assertEqual(len(response.context['page_obj']), 1)
 
     def test_first_page_group_list(self):
         response = self.authorized_author.get(reverse(
             'posts:profile',
-            kwargs={'username': '2'})
+            kwargs={'username': viewsTests.authot.username})
         )
         self.assertEqual(len(response.context['page_obj']), 10)
 
     def test_second_page_group_list(self):
         response = self.authorized_author.get(reverse(
             'posts:profile',
-            kwargs={'username': '2'}) + '?page=2'
+            kwargs={'username': viewsTests.authot.username}) + '?page=2'
         )
         self.assertEqual(len(response.context['page_obj']), 2)
 
@@ -197,23 +197,23 @@ class viewsTests(TestCase):
         }
         self.guest_client.post(
             reverse(
-                'posts:add_comment', kwargs={'post_id': 1}
+                'posts:add_comment', kwargs={'post_id': viewsTests.post[0].id}
             ), form_data, follow=True
         )
         self.assertEqual(Comment.objects.count(), comment_count)
         response = self.authorized_author.post(
             reverse(
-                'posts:add_comment', kwargs={'post_id': 3}
+                'posts:add_comment', kwargs={'post_id': viewsTests.post[2].id}
             ), form_data, follow=True
         )
         self.assertEqual(Comment.objects.count(), comment_count + 1)
         self.assertRedirects(response, reverse(
             'posts:post_detail',
-            kwargs={'post_id': 3})
+            kwargs={'post_id': viewsTests.post[2].id})
         )
         response1 = self.authorized_author.get(
             reverse(
-                'posts:post_detail', kwargs={'post_id': 3}
+                'posts:post_detail', kwargs={'post_id': viewsTests.post[2].id}
             )
         )
         form_field_text = response1.context['comments'][0].text
