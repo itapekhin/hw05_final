@@ -47,7 +47,8 @@ class viewsTests(TestCase):
                 kwargs={'slug': viewsTests.group[0].slug}
             ),
             'posts/profile.html': reverse(
-                'posts:profile', kwargs={'username': viewsTests.authot.username}
+                'posts:profile',
+                kwargs={'username': viewsTests.authot.username}
             ),
             'posts/post_detail.html': reverse(
                 'posts:post_detail', kwargs={'post_id': viewsTests.post[0].id}
