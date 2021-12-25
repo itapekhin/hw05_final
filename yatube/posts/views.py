@@ -148,8 +148,8 @@ def profile_follow(request, username):
     # Подписаться на автора
     author = get_object_or_404(User, username=username)
     try:
-        if (request.user != author and not 
-                Follow.objects.filter(user=request.user, author=author).exists()):
+        if (request.user != author and not Follow.objects.filter
+                (user=request.user, author=author).exists()):
             Follow.objects.create(user=request.user, author=author)
         return redirect('posts:profile', username=username)
     except IntegrityError:
