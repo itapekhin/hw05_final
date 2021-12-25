@@ -35,7 +35,7 @@ class TaskCreateFormTests(TestCase):
         tasks_count = Post.objects.count()
         form_data = {
             'text': 'Test',
-            'group': '1'}
+            'group': TaskCreateFormTests.group[0].id}
         self.authorized_author.post(
             reverse('posts:post_create'),
             data=form_data,
@@ -44,13 +44,13 @@ class TaskCreateFormTests(TestCase):
         self.assertEqual(Post.objects.count(), tasks_count + 1)
         self.assertTrue(Post.objects.filter(
             text='Test',
-            group='1'
+            group=TaskCreateFormTests.group[0].id
         ).exists())
 
     def test_post_edit(self):
         form_data = {
             'text': 'Test',
-            'group': '1'}
+            'group': TaskCreateFormTests.group[0].id}
         self.authorized_author.post(
             reverse('posts:post_edit', args=[1]),
             data=form_data,
@@ -58,5 +58,5 @@ class TaskCreateFormTests(TestCase):
         )
         self.assertTrue(Post.objects.filter(
             text='Test',
-            group='1'
+            group=TaskCreateFormTests.group[0].id
         ).exists())

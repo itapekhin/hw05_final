@@ -16,7 +16,8 @@
               <li>
                 Дата публикации: {{ post.pub_date|date:"d E Y" }}
               </li>
-
+            {% if user.is_authenticated %}
+              {% if request.user.username != post.author.username %}
               <li>
                 {% if following %}
                 <a
@@ -34,7 +35,8 @@
                 </a>
                 {% endif %}
               </li>
-
+              {% endif %}
+              {% endif %}
             </ul>
             <div>
               {% thumbnail post.image "320x160" crop="center" upscale=True as im %}

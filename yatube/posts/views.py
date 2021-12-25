@@ -40,7 +40,12 @@ def profile(request, username):
     profile_posts = author.posts.all()
     profile_count = profile_posts.count()
     user = request.user
-    following = user.is_authenticated and author.following.exists()
+    if request.user.is_authenticated == False:
+        following = False
+    elif Follow.objects.filter(user=user, author=request.user).exists():
+        following = False
+    else:
+        following = user.is_authenticated and author.following.exists()
     paginator = Paginator(profile_posts, settings.COL_ZAP)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -141,9 +146,11 @@ def follow_index(request):
 @login_required
 def profile_follow(request, username):
     # Подписаться на автора
-    author = User.objects.get(username=username)
+    
+    author = get_object_or_404(User, username=username)
     try:
-        if request.user is not author:
+        if (request.user != author and
+            not Follow.objects.filter(user=request.user, author=author).exists()):
             Follow.objects.create(user=request.user, author=author)
         return redirect('posts:profile', username=username)
     except IntegrityError:
@@ -153,7 +160,7 @@ def profile_follow(request, username):
 @login_required
 def profile_unfollow(request, username):
     # Дизлайк, отписка
-    author = User.objects.get(username=username)
-    if request.user is not author:
+    author = get_object_or_404(User, username=username)
+    if request.user != author:
         Follow.objects.filter(user=request.user, author=author).delete()
     return redirect('posts:profile', username=username)
