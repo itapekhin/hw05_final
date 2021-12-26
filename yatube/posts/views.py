@@ -1,36 +1,37 @@
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.conf import settings
-from django.shortcuts import get_object_or_404, redirect, render
 from django.db import IntegrityError
-from posts.models import Group, Post, User, Follow
-from .forms import PostForm, CommentForm
+from django.shortcuts import get_object_or_404, redirect, render
+from posts.models import Follow, Group, Post, User
+from .forms import CommentForm, PostForm
 
+
+def get_page_context(queryset, request):
+    paginator = Paginator(queryset, settings.COL_ZAP)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return {
+        'paginator': paginator,
+        'page_number': page_number,
+        'page_obj': page_obj,
+    }
 
 def index(request):
     template = 'posts/index.html'
-    post_list = Post.objects.all()
-    paginator = Paginator(post_list, settings.COL_ZAP)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    context = {
-        'page_obj': page_obj,
-        'paginator': paginator,
-    }
+    context = get_page_context(Post.objects.all(), request)
     return render(request, template, context)
 
 
 def group_posts(request, slug):
     template = 'posts/group_list.html'
     group = get_object_or_404(Group, slug=slug)
-    post_list = group.posts.all()
-    paginator = Paginator(post_list, settings.COL_ZAP)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    posts = group.posts.all()[:10]
     context = {
         'group': group,
-        'page_obj': page_obj,
+        'posts': posts,
     }
+    context.update(get_page_context(group.posts.all(), request))
     return render(request, template, context)
 
 
@@ -40,21 +41,18 @@ def profile(request, username):
     profile_posts = author.posts.all()
     profile_count = profile_posts.count()
     user = request.user
-    if not request.user.is_authenticated:
+    if not user.is_authenticated:
         following = False
     elif Follow.objects.filter(user=user, author=request.user).exists():
         following = False
     else:
         following = user.is_authenticated and author.following.exists()
-    paginator = Paginator(profile_posts, settings.COL_ZAP)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
     context = {
         'profile_count': profile_count,
         'author': author,
-        'page_obj': page_obj,
         'following': following
     }
+    context.update(get_page_context(author.posts.all(), request))
     return render(request, template, context)
 
 
@@ -131,15 +129,11 @@ def add_comment(request, post_id):
 
 @login_required
 def follow_index(request):
-    follow = Follow.objects.filter(user=request.user)
-    following_a = User.objects.filter(following__in=follow)
-    post_list = Post.objects.filter(author__in=following_a)
-    paginator = Paginator(post_list, settings.COL_ZAP)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    post_list = Post.objects.filter(author__following__user=request.user)
     context = {
-        'page_obj': page_obj,
+        'post_list': post_list,
     }
+    context.update(get_page_context(post_list, request))
     return render(request, 'posts/follow.html', context)
 
 
@@ -147,13 +141,11 @@ def follow_index(request):
 def profile_follow(request, username):
     # Подписаться на автора
     author = get_object_or_404(User, username=username)
-    try:
-        if (request.user != author and not Follow.objects.filter
-                (user=request.user, author=author).exists()):
-            Follow.objects.create(user=request.user, author=author)
-        return redirect('posts:profile', username=username)
-    except IntegrityError:
-        return redirect('posts:profile', username=username)
+    if (request.user != author and not Follow.objects.filter
+            (user=request.user, author=author).exists()):
+        Follow.objects.create(user=request.user, author=author)
+    return redirect('posts:profile', username=username)
+
 
 
 @login_required

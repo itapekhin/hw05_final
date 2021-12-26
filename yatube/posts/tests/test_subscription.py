@@ -5,7 +5,8 @@ from mixer.backend.django import mixer
 from posts.models import Follow, Group, Post, User
 
 
-class PodpiskaTests(TestCase):
+class SubscriptionTests(TestCase):
+    
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -43,43 +44,43 @@ class PodpiskaTests(TestCase):
 
     def setUp(self):
         self.authorized_author = Client()
-        self.authorized_author.force_login(PodpiskaTests.author)
+        self.authorized_author.force_login(SubscriptionTests.author)
 
         self.authorized_author1 = Client()
-        self.authorized_author1.force_login(PodpiskaTests.author1)
+        self.authorized_author1.force_login(SubscriptionTests.author1)
 
         self.authorized_author2 = Client()
-        self.authorized_author2.force_login(PodpiskaTests.author2)
+        self.authorized_author2.force_login(SubscriptionTests.author2)
 
-    def test_podpiska_follow_unfollow_author_create_post(self):
+    def test_subscription_follow_unfollow_author_create_post(self):
 
         self.authorized_author.get(reverse(
             'posts:profile_follow',
-            kwargs={'username': PodpiskaTests.author2})
+            kwargs={'username': SubscriptionTests.author2})
         )
         self.authorized_author.get(reverse(
             'posts:profile_follow',
-            kwargs={'username': PodpiskaTests.author1})
+            kwargs={'username': SubscriptionTests.author1})
         )
         response = self.authorized_author.get(reverse(
             'posts:follow_index')
         )
         first_object = response.context['page_obj'].object_list[0]
-        self.assertEqual(first_object, PodpiskaTests.post2)
+        self.assertEqual(first_object, SubscriptionTests.post1)
         self.authorized_author.get(reverse(
             'posts:profile_unfollow',
-            kwargs={'username': PodpiskaTests.author2})
+            kwargs={'username': SubscriptionTests.author2})
         )
         response1 = self.authorized_author.get(reverse(
             'posts:follow_index')
         )
         first_object1 = response1.context['page_obj'].object_list[0]
-        self.assertEqual(first_object1, PodpiskaTests.post1)
+        self.assertEqual(first_object1, SubscriptionTests.post1)
 
         d_post = Post.objects.create(
-            author=PodpiskaTests.author1,
+            author=SubscriptionTests.author1,
             text='Дополнительный пост',
-            group=PodpiskaTests.group[1]
+            group=SubscriptionTests.group[1]
         )
         response2 = self.authorized_author.get(reverse(
             'posts:follow_index')
