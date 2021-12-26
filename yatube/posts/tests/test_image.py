@@ -72,7 +72,6 @@ class ImageTests(TestCase):
         self.assertEqual(out_post.group.id, ImageTests.group[0].id)
         self.assertEqual(out_post.image.name, f'posts/{uploaded.name}')
 
-
     def test_post_create_image(self):
         small_gif = (
             b'\x47\x49\x46\x38\x39\x61\x01\x00'

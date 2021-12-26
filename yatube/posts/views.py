@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db import IntegrityError
 from django.shortcuts import get_object_or_404, redirect, render
 from posts.models import Follow, Group, Post, User
 from .forms import CommentForm, PostForm
@@ -16,6 +15,7 @@ def get_page_context(queryset, request):
         'page_number': page_number,
         'page_obj': page_obj,
     }
+
 
 def index(request):
     template = 'posts/index.html'
@@ -145,7 +145,6 @@ def profile_follow(request, username):
             (user=request.user, author=author).exists()):
         Follow.objects.create(user=request.user, author=author)
     return redirect('posts:profile', username=username)
-
 
 
 @login_required

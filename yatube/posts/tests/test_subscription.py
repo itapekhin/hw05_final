@@ -6,7 +6,7 @@ from posts.models import Follow, Group, Post, User
 
 
 class SubscriptionTests(TestCase):
-    
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
