@@ -109,7 +109,7 @@ class ImageTests(TestCase):
         post_image = first_object1.image.name.split('/')[-1]
         self.assertEqual(post_image, uploaded.name)
 
-        post_slig = Post.objects.filter(text='Test123123').values()[0]
+        post_slig = Post.objects.filter(text=form_data['text']).values()[0]
         post_group = Group.objects.filter(id=post_slig["group_id"]).values()[0]
         response2 = self.authorized_author.get(reverse(
             'posts:group_posts',
