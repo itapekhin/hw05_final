@@ -66,7 +66,7 @@ class SubscriptionTests(TestCase):
             'posts:follow_index')
         )
         first_object = response.context['page_obj'].object_list[0]
-        self.assertEqual(first_object, SubscriptionTests.post1)
+        self.assertEqual(first_object, SubscriptionTests.post2)
 
     def test_subscription_unfollow(self):
         self.authorized_author.get(reverse(
