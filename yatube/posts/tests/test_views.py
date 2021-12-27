@@ -1,9 +1,9 @@
 import time
+from mixer.backend.django import mixer
 from django import forms
 from django.core.cache import cache
 from django.test import Client, TestCase
 from django.urls import reverse
-from mixer.backend.django import mixer
 from posts.models import Comment, Group, Post, User
 
 

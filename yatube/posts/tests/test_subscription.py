@@ -1,7 +1,7 @@
+from mixer.backend.django import mixer
 from django.db import IntegrityError
 from django.test import Client, TestCase
 from django.urls import reverse
-from mixer.backend.django import mixer
 from posts.models import Follow, Group, Post, User
 
 
