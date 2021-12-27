@@ -177,7 +177,7 @@ class viewsTests(TestCase):
             kwargs={'slug': viewsTests.group[0].slug}) + '?page=2'
         )
         self.assertEqual(len(response.context['page_obj']),
-                             Post.objects.all().count() - 10)
+                         Post.objects.all().count() - 10)
 
     def test_first_page_group_list(self):
         response = self.authorized_author.get(reverse(
@@ -192,7 +192,7 @@ class viewsTests(TestCase):
             kwargs={'username': viewsTests.authot.username}) + '?page=2'
         )
         self.assertEqual(len(response.context['page_obj']),
-                             Post.objects.all().count() - 10)
+                         Post.objects.all().count() - 10)
 
     def test_comment(self):
         comment_count = Comment.objects.count()
