@@ -1,5 +1,5 @@
-from django.test import TestCase, Client
-from posts.models import Post, Group, User
+from django.test import Client, TestCase
+from posts.models import Group, Post, User
 
 
 class StaticURLTests(TestCase):

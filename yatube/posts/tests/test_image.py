@@ -1,7 +1,6 @@
 import random
 import shutil
 import tempfile
-
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
@@ -68,9 +67,9 @@ class ImageTests(TestCase):
         )
         self.assertEqual(Post.objects.count(), post_count + 1)
         out_post = Post.objects.order_by('-id')[0]
-        self.assertEqual(out_post.text, 'Test')
+        self.assertEqual(out_post.text, form_data['text'])
         self.assertEqual(out_post.group.id, ImageTests.group[0].id)
-        self.assertEqual(out_post.image.name, f'posts/{uploaded.name}')
+        self.assertEqual(out_post.image.name.split('/')[-1], uploaded.name)
 
     def test_post_create_image(self):
         small_gif = (
@@ -97,16 +96,16 @@ class ImageTests(TestCase):
         )
         response = self.authorized_author.get(reverse('posts:index'))
         first_object = response.context['page_obj'][0]
-        post_image = first_object.image
-        self.assertEqual(post_image, f'posts/{uploaded.name}')
+        post_image = first_object.image.name.split('/')[-1]
+        self.assertEqual(post_image, uploaded.name)
 
-        id_post = Post.objects.filter(text='Test123123').values()[0]
+        id_post = Post.objects.filter(text=form_data['text']).values()[0]
         response1 = self.authorized_author.get(reverse(
             'posts:post_detail', kwargs={'post_id': id_post["id"]})
         )
         first_object1 = response1.context['post']
-        post_image = first_object1.image
-        self.assertEqual(post_image, f'posts/{uploaded.name}')
+        post_image = first_object1.image.name.split('/')[-1]
+        self.assertEqual(post_image, uploaded.name)
 
         post_slig = Post.objects.filter(text='Test123123').values()[0]
         post_group = Group.objects.filter(id=post_slig["group_id"]).values()[0]
@@ -115,12 +114,12 @@ class ImageTests(TestCase):
             kwargs={'slug': post_group["slug"]})
         )
         first_object2 = response2.context['page_obj'][0]
-        post_image = first_object2.image
-        self.assertEqual(post_image, f'posts/{uploaded.name}')
+        post_image = first_object2.image.name.split('/')[-1]
+        self.assertEqual(post_image, uploaded.name)
 
         response3 = self.authorized_author.get(reverse(
             'posts:profile', kwargs={'username': ImageTests.author.username})
         )
         first_object3 = response3.context['page_obj'][0]
-        post_image = first_object3.image
-        self.assertEqual(post_image, f'posts/{uploaded.name}')
+        post_image = first_object3.image.name.split('/')[-1]
+        self.assertEqual(post_image, uploaded.name)

@@ -52,7 +52,7 @@ class SubscriptionTests(TestCase):
         self.authorized_author2 = Client()
         self.authorized_author2.force_login(SubscriptionTests.author2)
 
-    def test_subscription_follow_unfollow_author_create_post(self):
+    def test_subscription_follow(self):
 
         self.authorized_author.get(reverse(
             'posts:profile_follow',
@@ -66,34 +66,49 @@ class SubscriptionTests(TestCase):
             'posts:follow_index')
         )
         first_object = response.context['page_obj'].object_list[0]
-        self.assertEqual(first_object, SubscriptionTests.post2)
+        self.assertEqual(first_object, SubscriptionTests.post1)
+
+    def test_subscription_unfollow(self):
+        self.authorized_author.get(reverse(
+            'posts:profile_follow',
+            kwargs={'username': SubscriptionTests.author2})
+        )
+        self.authorized_author.get(reverse(
+            'posts:profile_follow',
+            kwargs={'username': SubscriptionTests.author1})
+        )
         self.authorized_author.get(reverse(
             'posts:profile_unfollow',
             kwargs={'username': SubscriptionTests.author2})
         )
-        response1 = self.authorized_author.get(reverse(
+        response = self.authorized_author.get(reverse(
             'posts:follow_index')
         )
-        first_object1 = response1.context['page_obj'].object_list[0]
-        self.assertEqual(first_object1, SubscriptionTests.post1)
+        first_object = response.context['page_obj'].object_list[0]
+        self.assertEqual(first_object, SubscriptionTests.post1)
 
+    def test_subscription_create_post(self):
+        self.authorized_author.get(reverse(
+            'posts:profile_follow',
+            kwargs={'username': SubscriptionTests.author1})
+        )
         d_post = Post.objects.create(
             author=SubscriptionTests.author1,
             text='Дополнительный пост',
             group=SubscriptionTests.group[1]
         )
-        response2 = self.authorized_author.get(reverse(
+        response = self.authorized_author.get(reverse(
             'posts:follow_index')
         )
-        first_object2 = response2.context['page_obj'].object_list[0]
-        self.assertEqual(first_object2, d_post)
-        response3 = self.authorized_author2.get(reverse(
+        first_object = response.context['page_obj'].object_list[0]
+        self.assertEqual(first_object, d_post)
+        response1 = self.authorized_author2.get(reverse(
             'posts:follow_index')
         )
-        first_object3 = response3.context['page_obj'].object_list
-        self.assertNotIn(d_post, first_object3)
+        first_object1 = response1.context['page_obj'].object_list
+        self.assertNotIn(d_post, first_object1)
 
-    def test_model_mete_Follow(self):
+    def test_model_meta_follow(self):
 
         with self.assertRaisesMessage(IntegrityError, 'authoe_author'):
             Follow.objects.create(user=self.author, author=self.author)

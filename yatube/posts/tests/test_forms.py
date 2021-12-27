@@ -1,8 +1,8 @@
-from posts.models import Post, Group, User
+import random
 from django.test import Client, TestCase
 from django.urls import reverse
 from mixer.backend.django import mixer
-import random
+from posts.models import Group, Post, User
 
 
 class TaskCreateFormTests(TestCase):
@@ -43,7 +43,7 @@ class TaskCreateFormTests(TestCase):
         )
         self.assertEqual(Post.objects.count(), tasks_count + 1)
         self.assertTrue(Post.objects.filter(
-            text='Test',
+            text=form_data['text'],
             group=TaskCreateFormTests.group[0].id
         ).exists())
 
@@ -57,6 +57,6 @@ class TaskCreateFormTests(TestCase):
             follow=True
         )
         self.assertTrue(Post.objects.filter(
-            text='Test',
+            text=form_data['text'],
             group=TaskCreateFormTests.group[0].id
         ).exists())

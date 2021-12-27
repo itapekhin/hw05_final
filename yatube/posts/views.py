@@ -1,4 +1,4 @@
-from django.conf import settings
+import utils
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
@@ -6,20 +6,9 @@ from posts.models import Follow, Group, Post, User
 from .forms import CommentForm, PostForm
 
 
-def get_page_context(queryset, request):
-    paginator = Paginator(queryset, settings.COL_ZAP)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    return {
-        'paginator': paginator,
-        'page_number': page_number,
-        'page_obj': page_obj,
-    }
-
-
 def index(request):
     template = 'posts/index.html'
-    context = get_page_context(Post.objects.all(), request)
+    context = utils.get_page_context(Post.objects.all(), request)
     return render(request, template, context)
 
 
@@ -31,7 +20,7 @@ def group_posts(request, slug):
         'group': group,
         'posts': posts,
     }
-    context.update(get_page_context(group.posts.all(), request))
+    context.update(utils.get_page_context(group.posts.all(), request))
     return render(request, template, context)
 
 
@@ -41,18 +30,17 @@ def profile(request, username):
     profile_posts = author.posts.all()
     profile_count = profile_posts.count()
     user = request.user
-    if not user.is_authenticated:
+    if not user.is_authenticated or Follow.objects.filter(
+        user=user, author=request.user
+    ).exists():
         following = False
-    elif Follow.objects.filter(user=user, author=request.user).exists():
-        following = False
-    else:
-        following = user.is_authenticated and author.following.exists()
+    following = user.is_authenticated and author.following.exists()
     context = {
         'profile_count': profile_count,
         'author': author,
         'following': following
     }
-    context.update(get_page_context(author.posts.all(), request))
+    context.update(utils.get_page_context(author.posts.all(), request))
     return render(request, template, context)
 
 
@@ -133,7 +121,7 @@ def follow_index(request):
     context = {
         'post_list': post_list,
     }
-    context.update(get_page_context(post_list, request))
+    context.update(utils.get_page_context(post_list, request))
     return render(request, 'posts/follow.html', context)
 
 

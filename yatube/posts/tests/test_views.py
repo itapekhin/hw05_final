@@ -1,10 +1,10 @@
-from django.test import TestCase, Client
-from posts.models import Post, Group, User, Comment
-from django.urls import reverse
-from django import forms
 import time
-from mixer.backend.django import mixer
+from django import forms
 from django.core.cache import cache
+from django.test import Client, TestCase
+from django.urls import reverse
+from mixer.backend.django import mixer
+from posts.models import Comment, Group, Post, User
 
 
 class viewsTests(TestCase):
@@ -78,7 +78,7 @@ class viewsTests(TestCase):
         post_text_0 = first_object.text
         post_group_0 = first_object.group
         self.assertEqual(post_author_0, viewsTests.post[0].author)
-        self.assertEqual(post_text_0, 'Тестовый текст')
+        self.assertEqual(post_text_0, Post.objects.all()[0].text)
         self.assertEqual(post_group_0, viewsTests.group[1])
 
     def test_group_list_page_show_correct_context(self):
@@ -91,7 +91,7 @@ class viewsTests(TestCase):
         post_author_0 = first_object.author
         post_text_0 = first_object.text
         self.assertEqual(post_author_0, viewsTests.post[0].author)
-        self.assertEqual(post_text_0, 'Тестовый текст')
+        self.assertEqual(post_text_0, Post.objects.all()[0].text)
         self.assertAlmostEqual(group, viewsTests.group[1])
 
     def test_profile_page_show_correct_context(self):
@@ -104,8 +104,8 @@ class viewsTests(TestCase):
         first_object = response.context['page_obj'][0]
         post_text_0 = first_object.text
         self.assertEqual(author, viewsTests.post[0].author)
-        self.assertEqual(profile_count, 12)
-        self.assertEqual(post_text_0, 'Тестовый текст')
+        self.assertEqual(profile_count, Post.objects.all().count())
+        self.assertEqual(post_text_0, Post.objects.all()[0].text)
 
     def test_post_detail_page_show_correct_context(self):
         response = self.authorized_author.get(reverse(
@@ -115,7 +115,7 @@ class viewsTests(TestCase):
         post = response.context['post']
         post_count = response.context['post_count']
         self.assertEqual(post, viewsTests.post[0])
-        self.assertEqual(post_count, 12)
+        self.assertEqual(post_count, Post.objects.all().count())
 
     def test_post_create_page_type_pole_correct(self):
         response = self.authorized_author.get(
@@ -161,7 +161,7 @@ class viewsTests(TestCase):
 
     def test_second_page_index(self):
         response = self.client.get(reverse('posts:index') + '?page=2')
-        self.assertEqual(len(response.context['page_obj']), 2)
+        self.assertEqual(len(response.context['page_obj']), Post.objects.all().count() - 10)
 
     def test_first_page_group_list(self):
         response = self.authorized_author.get(reverse(
@@ -175,7 +175,7 @@ class viewsTests(TestCase):
             'posts:group_posts',
             kwargs={'slug': viewsTests.group[0].slug}) + '?page=2'
         )
-        self.assertEqual(len(response.context['page_obj']), 1)
+        self.assertEqual(len(response.context['page_obj']), Post.objects.all().count() - 10)
 
     def test_first_page_group_list(self):
         response = self.authorized_author.get(reverse(
@@ -189,7 +189,7 @@ class viewsTests(TestCase):
             'posts:profile',
             kwargs={'username': viewsTests.authot.username}) + '?page=2'
         )
-        self.assertEqual(len(response.context['page_obj']), 2)
+        self.assertEqual(len(response.context['page_obj']), Post.objects.all().count() - 10)
 
     def test_comment(self):
         comment_count = Comment.objects.count()
@@ -218,7 +218,7 @@ class viewsTests(TestCase):
             )
         )
         form_field_text = response1.context['comments'][0].text
-        self.assertEqual(form_field_text, '123456')
+        self.assertEqual(form_field_text, form_data['text'])
 
     def test_index_cash(self):
         cache.clear()
