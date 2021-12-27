@@ -1,7 +1,9 @@
 import random
+
 from django.test import Client, TestCase
 from django.urls import reverse
 from mixer.backend.django import mixer
+
 from posts.models import Group, Post, User
 
 

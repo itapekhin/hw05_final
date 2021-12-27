@@ -1,8 +1,9 @@
-import utils
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
+
+import utils
+from posts.forms import CommentForm, PostForm
 from posts.models import Follow, Group, Post, User
-from .forms import CommentForm, PostForm
 
 
 def index(request):
