@@ -30,13 +30,11 @@ def profile(request, username):
     profile_posts = author.posts.all()
     profile_count = profile_posts.count()
     user = request.user
+    following = None
     if user.is_authenticated:
         following = Follow.objects.filter(
             user=user, author=author
         ).exists()
-    elif not user.is_authenticated or Follow.objects.filter(
-            user=user, author=user):
-        following = None
     context = {
         'profile_count': profile_count,
         'author': author,
