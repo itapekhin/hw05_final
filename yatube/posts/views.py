@@ -30,7 +30,7 @@ def profile(request, username):
     profile_posts = author.posts.all()
     profile_count = profile_posts.count()
     user = request.user
-    following = user.is_authenticated and author.following.exists()
+    following = author.following.exists()
     if not user.is_authenticated or Follow.objects.filter(
         user=user, author=request.user
     ).exists():
