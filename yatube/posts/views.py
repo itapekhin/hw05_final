@@ -35,7 +35,7 @@ def profile(request, username):
             user=user, author=author
         ).exists()
     elif not user.is_authenticated or Follow.objects.filter(
-            user=user,author=user):
+            user=user, author=user):
         following = None
     context = {
         'profile_count': profile_count,
